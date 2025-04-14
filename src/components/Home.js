@@ -1,18 +1,21 @@
 import { useState } from 'react';
-import "./Home.css"
+import { Link } from 'react-router-dom';
+import { useCart } from './CartContext';
+import "./Home.css";
 
 // Image Imports
-import prod1Img from "../assets/prod1.png"
-import prod2Img from "../assets/prod2.png"
-import prod3Img from "../assets/prod3.png"
-import prod4Img from "../assets/prod4.png"
-
-import cat1Img from "../assets/cat1.png"
-import cat2Img from "../assets/cat2.png"
-import cat3Img from "../assets/cat3.png"
-import cat4Img from "../assets/cat4.png"
+import prod1Img from "../assets/prod1.png";
+import prod2Img from "../assets/prod2.png";
+import prod3Img from "../assets/prod3.png";
+import prod4Img from "../assets/prod4.png";
+import cat1Img from "../assets/cat1.png";
+import cat2Img from "../assets/cat2.png";
+import cat3Img from "../assets/cat3.png";
+import cat4Img from "../assets/cat4.png";
+import heroBanner from "../assets/hero-banner-bg.png";
 
 const Home = () => {
+  const { addToCart } = useCart();
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -23,17 +26,16 @@ const Home = () => {
       name: "Performance Training Tee",
       price: 39.99,
       image: prod1Img,
-      category: "Tops",
+      category: "Performance Tops",
       badge: "Best Seller",
-      description: "Ultra-lightweight training tee with moisture-wicking technology to keep you dry during intense workouts. Features strategic ventilation zones for maximum breathability.",
+      description: "Ultra-lightweight training tee with moisture-wicking technology to keep you dry during intense workouts.",
       sizes: ['S', 'M', 'L', 'XL'],
       colors: ['Black', 'Navy', 'Gray'],
       details: [
         "92% Polyester, 8% Spandex",
         "Machine wash cold, tumble dry low",
         "Flatlock seams reduce chafing",
-        "UPF 50+ sun protection",
-        "4-way stretch for full range of motion"
+        "UPF 50+ sun protection"
       ],
       rating: 4.8,
       reviews: 124
@@ -43,17 +45,16 @@ const Home = () => {
       name: "Elite Compression Shorts",
       price: 44.99,
       image: prod2Img,
-      category: "Bottoms",
+      category: "Compression Wear",
       badge: "New",
-      description: "High-performance compression shorts designed to support muscles and reduce fatigue during training. Features a secure pocket for keys or cards.",
+      description: "High-performance compression shorts designed to support muscles and reduce fatigue during training.",
       sizes: ['S', 'M', 'L'],
       colors: ['Black', 'Royal Blue', 'Red'],
       details: [
         "88% Nylon, 12% Spandex",
         "Machine wash cold, line dry",
         "Anti-odor technology",
-        "Gripper elastic waistband",
-        "Reflective logo for low-light visibility"
+        "Gripper elastic waistband"
       ],
       rating: 4.9,
       reviews: 87
@@ -63,16 +64,15 @@ const Home = () => {
       name: "Flex Training Joggers",
       price: 59.99,
       image: prod3Img,
-      category: "Bottoms",
-      description: "Versatile training joggers with exceptional flexibility and comfort. Perfect for gym sessions or casual wear with a tapered athletic fit.",
+      category: "Training Bottoms",
+      description: "Versatile training joggers with exceptional flexibility and comfort.",
       sizes: ['XS', 'S', 'M', 'L', 'XL'],
       colors: ['Charcoal', 'Black', 'Olive'],
       details: [
         "85% Cotton, 15% Polyester",
         "Machine wash cold, tumble dry low",
         "Elastic waistband with drawstring",
-        "Zippered security pockets",
-        "Ankle cuffs for adjustable fit"
+        "Zippered security pockets"
       ],
       rating: 4.7,
       reviews: 203
@@ -82,21 +82,20 @@ const Home = () => {
       name: "Breathable Workout Hoodie",
       price: 64.99,
       image: prod4Img,
-      category: "Tops",
+      category: "Performance Tops",
       badge: "Sale",
-      description: "Performance hoodie with mesh paneling for optimal airflow. Lightweight yet warm enough for outdoor workouts in cooler weather.",
+      description: "Performance hoodie with mesh paneling for optimal airflow.",
       sizes: ['S', 'M', 'L', 'XL', 'XXL'],
       colors: ['Black', 'Dark Gray', 'Navy'],
       details: [
         "80% Polyester, 20% Cotton",
         "Machine wash cold, hang dry",
         "Thumbhole cuffs for added coverage",
-        "Adjustable drawstring hood",
-        "Kangaroo pocket for storage"
+        "Adjustable drawstring hood"
       ],
       rating: 4.6,
       reviews: 156
-    },
+    }
   ];
 
   const categories = [
@@ -105,25 +104,29 @@ const Home = () => {
       name: "Performance Tops",
       image: cat1Img,
       count: "24 Products",
+      link: "/shop?category=performance-tops#shop-top"
     },
     {
       id: 2,
       name: "Training Bottoms",
       image: cat2Img,
       count: "18 Products",
+      link: "/shop?category=training-bottoms#shop-top"
     },
     {
       id: 3,
       name: "Compression Wear",
       image: cat3Img,
       count: "12 Products",
+      link: "/shop?category=compression-wear#shop-top"
     },
     {
       id: 4,
       name: "Accessories",
       image: cat4Img,
       count: "15 Products",
-    },
+      link: "/shop?category=accessories#shop-top"
+    }
   ];
 
   const testimonials = [
@@ -164,6 +167,15 @@ const Home = () => {
     if (newQuantity >= 1 && newQuantity <= 10) {
       setQuantity(newQuantity);
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart({
+      ...quickViewProduct,
+      selectedSize,
+      quantity
+    });
+    closeQuickView();
   };
 
   return (
@@ -241,7 +253,10 @@ const Home = () => {
                 </div>
                 
                 <div className="quick-view-actions">
-                  <button className="btn btn-primary add-to-cart">
+                  <button 
+                    className="btn btn-primary add-to-cart"
+                    onClick={handleAddToCart}
+                  >
                     Add to Cart - ${(quickViewProduct.price * quantity).toFixed(2)}
                   </button>
                   <button className="btn btn-secondary wishlist">
@@ -254,15 +269,19 @@ const Home = () => {
         </div>
       )}
 
-      {/* Rest of your existing JSX remains exactly the same */}
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1>ELEVATE YOUR TRAINING</h1>
-          <p>Premium fitness apparel engineered for peak performance</p>
-          <div className="hero-buttons">
-            <a href="/shop" className="btn btn-primary">Shop New Arrivals</a>
-            <a href="/collections/bestsellers" className="btn btn-secondary">Best Sellers</a>
+      <section 
+        className="hero-section"
+        style={{ backgroundImage: `linear-gradient(rgba(26, 36, 86, 0.7), rgba(26, 36, 86, 0.8)), url(${heroBanner})` }}
+      >
+        <div className="container">
+          <div className="hero-content">
+            <h1>ELEVATE YOUR TRAINING</h1>
+            <p>Premium fitness apparel engineered for peak performance</p>
+            <div className="hero-buttons">
+              <Link to="/shop#shop-top" className="btn btn-primary">Shop New Arrivals</Link>
+              <Link to="/shop?sort=bestsellers#shop-top" className="btn btn-secondary">Best Sellers</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -271,8 +290,34 @@ const Home = () => {
       <section className="benefits-section">
         <div className="container">
           <div className="benefits-grid">
-            {/* Icons and Text */}
-            {/* Keep SVGs here (no change) */}
+            <div className="benefit-item">
+              <div className="benefit-icon">
+                <i className="fas fa-truck"></i>
+              </div>
+              <h3>Free Shipping</h3>
+              <p>On all orders over $50</p>
+            </div>
+            <div className="benefit-item">
+              <div className="benefit-icon">
+                <i className="fas fa-undo"></i>
+              </div>
+              <h3>30-Day Returns</h3>
+              <p>No hassle return policy</p>
+            </div>
+            <div className="benefit-item">
+              <div className="benefit-icon">
+                <i className="fas fa-lock"></i>
+              </div>
+              <h3>Secure Checkout</h3>
+              <p>100% secure payment</p>
+            </div>
+            <div className="benefit-item">
+              <div className="benefit-icon">
+                <i className="fas fa-headset"></i>
+              </div>
+              <h3>24/7 Support</h3>
+              <p>Dedicated customer service</p>
+            </div>
           </div>
         </div>
       </section>
@@ -282,7 +327,7 @@ const Home = () => {
         <div className="container">
           <div className="section-header">
             <h2>Featured Products</h2>
-            <a href="/shop" className="view-all">View All</a>
+            <Link to="/shop#shop-top" className="view-all">View All</Link>
           </div>
           <div className="products-grid">
             {featuredProducts.map((product) => (
@@ -295,14 +340,32 @@ const Home = () => {
                     </span>
                   )}
                   <div className="product-actions">
-                    <button className="quick-view" onClick={() => openQuickView(product)}>Quick View</button>
-                    <button className="add-to-cart">Add to Cart</button>
+                    <button 
+                      className="quick-view" 
+                      onClick={() => openQuickView(product)}
+                    >
+                      Quick View
+                    </button>
+                    <button 
+                      className="add-to-cart"
+                      onClick={() => addToCart({ ...product, quantity: 1 })}
+                    >
+                      Add to Cart
+                    </button>
                   </div>
                 </div>
                 <div className="product-info">
                   <span className="product-category">{product.category}</span>
                   <h3 className="product-name">{product.name}</h3>
                   <span className="product-price">${product.price.toFixed(2)}</span>
+                  <div className="product-rating">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className={i < Math.floor(product.rating) ? "star filled" : "star"}>
+                        ★
+                      </span>
+                    ))}
+                    <span>({product.reviews})</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -310,8 +373,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Rest of your existing sections remain exactly the same */}
-      {/* Shop by Category Section */}
+      {/* Categories Section */}
       <section className="categories-section">
         <div className="container">
           <div className="section-header">
@@ -319,8 +381,8 @@ const Home = () => {
           </div>
           <div className="categories-grid">
             {categories.map((category) => (
-              <a
-                href={`/category/${category.name.toLowerCase().replace(/\s+/g, "-")}`}
+              <Link
+                to={category.link}
                 className="category-card"
                 key={category.id}
               >
@@ -331,7 +393,7 @@ const Home = () => {
                   <h3>{category.name}</h3>
                   <span>{category.count}</span>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -339,12 +401,14 @@ const Home = () => {
 
       {/* Banner Section */}
       <section className="banner-section">
-        <div className="banner-content">
-          <h2>NEW PERFORMANCE COLLECTION</h2>
-          <p>Engineered for elite athletes and fitness enthusiasts</p>
-          <a href="/collections/performance" className="btn btn-light">
-            Explore Collection
-          </a>
+        <div className="container">
+          <div className="banner-content">
+            <h2>NEW PERFORMANCE COLLECTION</h2>
+            <p>Engineered for elite athletes and fitness enthusiasts</p>
+            <Link to="/shop?collection=performance#shop-top" className="btn btn-light">
+              Explore Collection
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Shop.css';
 import { useCart } from './CartContext';
 
@@ -14,14 +14,14 @@ import prod7Img from '../assets/prod7.png';
 import prod8Img from '../assets/prod8.png';
 
 const Shop = () => {
-    const { addToCart } = useCart(); // Step 2: get addToCart from context
-  
-    const [quickViewProduct, setQuickViewProduct] = useState(null);
-    const [selectedSize, setSelectedSize] = useState('');
-    const [quantity, setQuantity] = useState(1);
-    const [activeCategory, setActiveCategory] = useState('All');
-    const [sortOption, setSortOption] = useState('featured');
-  
+  const { addToCart } = useCart();
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [sortOption, setSortOption] = useState('featured');
+  const location = useLocation();
+  const categoryRef = useRef(null);
 
   const categories = [
     'All',
@@ -30,6 +30,58 @@ const Shop = () => {
     'Compression Wear',
     'Accessories'
   ];
+
+  // Map URL query parameters to category names
+  const categoryMap = {
+    'performance-tops': 'Performance Tops',
+    'training-bottoms': 'Training Bottoms',
+    'compression-wear': 'Compression Wear',
+    'accessories': 'Accessories'
+  };
+
+  useEffect(() => {
+    // Parse URL query parameters to set the active category
+    const searchParams = new URLSearchParams(location.search);
+    const categoryParam = searchParams.get('category');
+    
+    if (categoryParam && categoryMap[categoryParam]) {
+      setActiveCategory(categoryMap[categoryParam]);
+      // Scroll to the top of the page first, then to the category section
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        if (categoryRef.current) {
+          categoryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else if (searchParams.get('collection') === 'performance') {
+      setActiveCategory('Performance Tops');
+    } else if (searchParams.get('sort') === 'bestsellers') {
+      setSortOption('rating');
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (window.location.hash === '#category-section') {
+      // Scroll to the top first, then to the category section
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        if (categoryRef.current) {
+          categoryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, []);
+
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+    // Scroll to the top first, then to the category section when a category is clicked
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      if (categoryRef.current) {
+        categoryRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
 
   const products = [
     {
@@ -331,13 +383,13 @@ const Shop = () => {
       {/* Shop Content */}
       <div className="shop-content">
         <div className="container">
-          <div className="shop-controls">
+          <div className="shop-controls" ref={categoryRef} id="category-section">
             <div className="category-filters">
               {categories.map(category => (
                 <button
                   key={category}
                   className={`category-filter ${activeCategory === category ? 'active' : ''}`}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => handleCategoryChange(category)}
                 >
                   {category}
                 </button>
@@ -361,45 +413,57 @@ const Shop = () => {
           </div>
 
           <div className="products-grid">
-            {sortedProducts.map(product => (
-              <div className="product-card" key={product.id}>
-                <div className="product-image">
-                  <img src={product.image} alt={product.name} />
-                  {product.badge && (
-                    <span className={`badge badge-${product.badge.toLowerCase().replace(/\s+/g, "-")}`}>
-                      {product.badge}
-                    </span>
-                  )}
-                  <div className="product-actions">
-                    <button 
-                      className="quick-view" 
-                      onClick={() => openQuickView(product)}
-                    >
-                      Quick View
-                    </button>
-                    <button 
-                      className="add-to-cart"
-                      onClick={() => addToCart({ ...product, quantity: 1 })}
-                    >
-                      Add to Cart
-                    </button>
-                  </div>
-                </div>
-                <div className="product-info">
-                  <span className="product-category">{product.category}</span>
-                  <h3 className="product-name">{product.name}</h3>
-                  <span className="product-price">${product.price.toFixed(2)}</span>
-                  <div className="product-rating">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className={i < Math.floor(product.rating) ? "star filled" : "star"}>
-                        ★
+            {sortedProducts.length > 0 ? (
+              sortedProducts.map(product => (
+                <div className="product-card" key={product.id}>
+                  <div className="product-image">
+                    <img src={product.image} alt={product.name} />
+                    {product.badge && (
+                      <span className={`badge badge-${product.badge.toLowerCase().replace(/\s+/g, "-")}`}>
+                        {product.badge}
                       </span>
-                    ))}
-                    <span>({product.reviews})</span>
+                    )}
+                    <div className="product-actions">
+                      <button 
+                        className="quick-view" 
+                        onClick={() => openQuickView(product)}
+                      >
+                        Quick View
+                      </button>
+                      <button 
+                        className="add-to-cart"
+                        onClick={() => addToCart({ ...product, quantity: 1 })}
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                  <div className="product-info">
+                    <span className="product-category">{product.category}</span>
+                    <h3 className="product-name">{product.name}</h3>
+                    <span className="product-price">${product.price.toFixed(2)}</span>
+                    <div className="product-rating">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={i < Math.floor(product.rating) ? "star filled" : "star"}>
+                          ★
+                        </span>
+                      ))}
+                      <span>({product.reviews})</span>
+                    </div>
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="no-products">
+                <p>No products found in this category.</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => handleCategoryChange('All')}
+                >
+                  View All Products
+                </button>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
