@@ -3,7 +3,7 @@ import './Cart.css';
 
 import { useCart } from './CartContext'; 
 const Cart = () => {
-    const { cartItems, removeFromCart, updateQuantity } = useCart(); // Step 2: Use context
+    const { cartItems, removeFromCart, updateQuantity } = useCart();
   
     const calculateSubtotal = () => {
       return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -11,7 +11,7 @@ const Cart = () => {
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
-    const shipping = subtotal > 0 ? 5.99 : 0; // Flat rate shipping
+    const shipping = subtotal > 0 ? 5.99 : 0;
     return subtotal + shipping;
   };
 
@@ -58,6 +58,7 @@ const Cart = () => {
                     <button 
                       className="quantity-btn" 
                       onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                      aria-label="Decrease quantity"
                     >
                       -
                     </button>
@@ -65,6 +66,7 @@ const Cart = () => {
                     <button 
                       className="quantity-btn"
                       onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                      aria-label="Increase quantity"
                     >
                       +
                     </button>
@@ -76,8 +78,12 @@ const Cart = () => {
                     <button 
                       className="remove-btn"
                       onClick={() => removeFromCart(item.id)}
+                      aria-label="Remove item"
                     >
-                      &times;
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </button>
                   </div>
                 </div>
