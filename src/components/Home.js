@@ -180,6 +180,9 @@ const Home = () => {
 
   return (
     <div className="home">
+      {/* Add Font Awesome CDN in the head section */}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      
       {/* Quick View Modal */}
       {quickViewProduct && (
         <div className="quick-view-modal">
